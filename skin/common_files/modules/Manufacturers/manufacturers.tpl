@@ -67,8 +67,9 @@ checkboxes = [{foreach from=$manufacturers item=v key=k}{if $k gt 0},{/if}'{if n
 
 <tr class="TableHead">
   {if $manufacturers ne ""}<td width="10">&nbsp;</td>{/if}
-  <td width="40%">{$lng.lbl_manufacturer}</td>
-  <td width="30%">{$lng.lbl_provider}</td>
+  <td width="30%">{$lng.lbl_manufacturer}</td>
+  <td width="15%">Country</td>
+  <td width="25%">{$lng.lbl_provider}</td>
   <td width="20%" align="center">{$lng.lbl_products}</td>
   <td width="30" align="center">{$lng.lbl_pos}</td>
   <td width="30" align="center">{$lng.lbl_active}</td>
@@ -81,6 +82,7 @@ checkboxes = [{foreach from=$manufacturers item=v key=k}{if $k gt 0},{/if}'{if n
 <tr{cycle values=", class='TableSubHead'"}>
   <td align="center"><input type="checkbox" name="to_delete[{$v.manufacturerid}]"{if not $administrate and ($v.provider ne $logged_userid or $v.used_by_others)} disabled="disabled"{/if} /></td>
   <td><b><a href="manufacturers.php?manufacturerid={$v.manufacturerid}{if $page}&amp;page={$page}{/if}">{$v.manufacturer}</a></b></td>
+  <td>{$v.country}</td>
   <td>{if $v.is_provider eq 'Y'}{$v.provider_name}{else}{$lng.lbl_manuf_owner_lost}{/if}{if $administrate} ({$v.provider}){/if}</td>
   <td align="center">{$v.products_count|default:$lng.txt_not_available}{if $v.used_by_others}*{assign var="show_note" value="Y"}{/if}</td>
   <td align="center"><input type="text" name="records[{$v.manufacturerid}][orderby]" size="5" value="{$v.orderby}"{if not $administrate} disabled="disabled"{/if} /></td>
@@ -91,12 +93,12 @@ checkboxes = [{foreach from=$manufacturers item=v key=k}{if $k gt 0},{/if}'{if n
 
 {if $show_note eq "Y"}
 <tr>
-  <td colspan="6"><br />{$lng.txt_manufacturers_special_note}</td>
+  <td colspan="7"><br />{$lng.txt_manufacturers_special_note}</td>
 </tr>
 {/if}
 
 <tr>
-  <td colspan="3" class="main-button">
+  <td colspan="4" class="main-button">
     <input type="submit" class="big-main-button" value="{$lng.lbl_update|strip_tags:false|escape}" />
   </td>
   <td colspan="3" align="right">
@@ -107,13 +109,13 @@ checkboxes = [{foreach from=$manufacturers item=v key=k}{if $k gt 0},{/if}'{if n
 {else}
 
 <tr>
-  <td colspan="6" align="center"><br />{$lng.txt_no_manufacturers}</td>
+  <td colspan="7" align="center"><br />{$lng.txt_no_manufacturers}</td>
 </tr>
 
 {/if}
 
 <tr>
-<td colspan="6"><br /><input type="button" value="{$lng.lbl_add_new_|strip_tags:false|escape}" onclick="javascript: self.location = 'manufacturers.php?mode=add';" /></td>
+<td colspan="7"><br /><input type="button" value="{$lng.lbl_add_new_|strip_tags:false|escape}" onclick="javascript: self.location = 'manufacturers.php?mode=add';" /></td>
 </tr>
 
 </table>
@@ -173,6 +175,18 @@ checkboxes = [{foreach from=$manufacturers item=v key=k}{if $k gt 0},{/if}'{if n
   <td><font class="Star">*</font></td>
   <td width="80%"><input type="text" name="manufacturer" id="manufacturer" size="50" value="{$manufacturer.manufacturer|escape}" style="width:80%"{$disabled} {if $config.SEO.clean_urls_enabled eq "Y" and $administrate}onchange="javascript: if (this.form.clean_url.value == '') copy_clean_url(this, this.form.clean_url)"{/if} /></td>
 </tr>
+<tr>
+  <td width="20%" class="FormButton">Country:</td>
+  <td><font class="Star">*</font></td>
+  <td width="80%">
+  	<select name="manufacture_country_id" class="InputWidth" style="width: 200px;">
+	{foreach from=$manufacture_country item=c key=manufacture_country}
+    	<option value="{$c.code}"{if $c.code eq $is_categories} selected="selected"{/if}>{$c.name}</option>
+	{/foreach}
+    </select>
+  </td>
+</tr>
+
 
 {if $administrate}
   {include file="main/clean_url_field.tpl" clean_url=$manufacturer.clean_url show_req_fields="Y" clean_urls_history=$manufacturer.clean_urls_history clean_url_fill_error=$top_message.clean_url_fill_error}

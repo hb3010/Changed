@@ -290,6 +290,11 @@ $sql_tbl = array (
     'users_online'                      => 'xcart_users_online',
     'zone_element'                      => 'xcart_zone_element',
     'zones'                             => 'xcart_zones',
+//BON ADD FOR MANUFACTURE COUNTRY
+	'manufacture_categories'            => 'xcart_manufacture_categories',
+	'manufacturers_to_categories'       => 'xcart_manufacturers_to_categories',
+//END BON ADD FOR MANUFACTURE COUNTRY
+
 );
 
 /**

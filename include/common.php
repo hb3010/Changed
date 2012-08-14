@@ -36,7 +36,7 @@
  * @author     Ruslan R. Fazlyev <rrf@x-cart.com>
  * @copyright  Copyright (c) 2001-2012 Qualiteam software Ltd <info@x-cart.com>. All rights reserved
  * @license    http://www.x-cart.com/license.php X-Cart license agreement
- * @version    $Id: common.php,v 1.9.2.6.2.1 2012/07/13 13:45:51 tito Exp $
+ * @version    $Id: common.php,v 1.9.2.6 2012/03/27 11:18:19 aim Exp $
  * @link       http://www.x-cart.com/
  * @see        ____file_see____
  */
@@ -101,12 +101,6 @@ switch ($current_area) {
 
         }
 
-        if (!empty($active_modules['New_Arrivals'])) {
-
-            include $xcart_dir . '/modules/New_Arrivals/customer_new_arrivals.php';
-
-        }
-
         break;
 
     case 'A':
@@ -118,5 +112,76 @@ switch ($current_area) {
     case 'B':
         break;
 }
+
+// BON ADD FOR CHANGE SHOW SUBCATEGORY 
+$sub_cat = array();
+foreach ($categories as $k => $v){
+	$i = 0;
+	$sub_cat_query = db_query("Select categoryid, category from $sql_tbl[categories] WHERE parentid='$k'");
+	while ($result = db_fetch_array($sub_cat_query)){
+		$sub_cat[$k][$i]["id"] = $result["categoryid"];
+		$sub_cat[$k][$i]["name"] = $result["category"];
+		$i++;
+	}
+}
+//(print_r($sub_cat));die();
+$smarty->assign('sub_cat_show', $sub_cat);
+// END BON ADD
+
+//Add for ajax load products list
+if(isset($_POST["ajax_load"])&&isset($_POST["catid"])){
+	
+	sleep(1);
+	
+	$catid = $_POST["catid"];
+	
+	$baseUrl_ajax = $_SERVER['PHP_SELF'];
+	$smarty->assign("baseUrl", $baseUrl_ajax);
+	
+	$products_ajax_load = array();
+	
+	$plist_ajax_query = db_query("Select pe.productid, pe.product, pe.descr, imt.image_path, p.list_price, pr.price From xcart_products_lng_en pe, $sql_tbl[images_T] imt, $sql_tbl[products] p, $sql_tbl[products_categories] pc, $sql_tbl[pricing] pr WHERE pe.productid=pc.productid and imt.id=pc.productid and p.productid=pc.productid and p.productid=pr.productid and pc.categoryid='$catid' group by pe.productid");
+	$i = 0;
+	while ($result = db_fetch_array($plist_ajax_query)){
+		$products_ajax_load[$i] = $result;
+		$image_path_ajax = $result["image_path"];
+		$img_ajax = explode("\\", $image_path_ajax);
+		$products_ajax_load[$i]["image_path"] = $img_ajax[3];
+		$i++;
+	}
+		
+	print_r(json_encode($products_ajax_load));
+	
+	die();
+}
+//End add ajax load
+
+//Add for ajax load manufacture products
+if(isset($_POST["ajax_load"])&&isset($_POST["manufactureid"])){
+	
+	sleep(1);
+	
+	$manufactureid = $_POST["manufactureid"];
+	
+	$baseUrl_ajax = $_SERVER['PHP_SELF'];
+	$smarty->assign("baseUrl", $baseUrl_ajax);
+	
+	$products_ajax_load = array();
+	
+	$plist_ajax_query = db_query("Select pe.productid, pe.product, pe.descr, imt.image_path, p.list_price, pr.price From xcart_products_lng_en pe, $sql_tbl[images_T] imt, $sql_tbl[products] p, $sql_tbl[pricing] pr WHERE pe.productid=p.productid and imt.id=p.productid and p.productid=pr.productid and p.manufacturerid='$manufactureid' group by p.productid");
+	$i = 0;
+	while ($result = db_fetch_array($plist_ajax_query)){
+		$products_ajax_load[$i] = $result;
+		$image_path_ajax = $result["image_path"];
+		$img_ajax = explode("\\", $image_path_ajax);
+		$products_ajax_load[$i]["image_path"] = $img_ajax[3];
+		$i++;
+	}
+		
+	print_r(json_encode($products_ajax_load));
+	
+	die();
+}
+//End add ajax load
 
 ?>

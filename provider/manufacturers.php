@@ -47,7 +47,7 @@ $trusted_post_variables = array('descr');
 
 require './auth.php';
 require $xcart_dir.'/include/security.php';
-
+func_403(45);
 if (empty($active_modules['Manufacturers']))
     func_403(45);
 

@@ -221,22 +221,7 @@ if (
     func_header_location('cart.php?mode=checkout' . ($paymentid ? '&paymentid=' . $paymentid : ''));
 }
 
-/**
- * Update Gift wrapping
- */
-include $xcart_dir . '/modules/Gift_Registry/giftreg_customer_cart.php';
 
-$smarty->assign(
-    'register_script_name',
-    (
-        ($config['Security']['use_https_login'] == 'Y')
-            ? $xcart_catalogs_secure['customer'] . '/'
-            : ''
-    )
-    . 'cart.php'
-);
-
-$return_url = '';
 
 /**
  * Add product to cart
@@ -364,6 +349,12 @@ if (
 
 }
 
+//BON ADD FOR AJAX LOAD CART
+if (isset($_POST["ajax_load"])&&($_POST["mode"]=="delete")){
+	$mode = $_POST["mode"];
+	$productindex = $_POST["productindex"];
+}
+
 /**
  * Delete product from the cart
  */
@@ -409,6 +400,46 @@ if (
 
     $return_url = 'cart.php';
 }
+
+//BON ADD FOR AJAX LOAD CART
+if (isset($_POST["ajax_load"])){
+	$cart_ajax_load = array();
+	$i = 0;
+	foreach ($cart["products"] as $v => $k){
+		$cart_ajax_load[$i]["amount"] = $k["amount"];
+		$cart_ajax_load[$i]["product"] = $k["product"];
+		$cart_ajax_load[$i]["price"] = $k["price"];
+		$cart_ajax_load[$i]["subtotal"] = $k["subtotal"];
+		$i++;
+	}
+
+	sleep(1);
+			
+	print_r(json_encode($cart_ajax_load));
+	
+	die();
+
+}
+
+
+//END BON ADD
+
+/**
+ * Update Gift wrapping
+ */
+include $xcart_dir . '/modules/Gift_Registry/giftreg_customer_cart.php';
+
+$smarty->assign(
+    'register_script_name',
+    (
+        ($config['Security']['use_https_login'] == 'Y')
+            ? $xcart_catalogs_secure['customer'] . '/'
+            : ''
+    )
+    . 'cart.php'
+);
+
+$return_url = '';
 
 if (empty($action)) {
 

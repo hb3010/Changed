@@ -31,7 +31,7 @@ vim: set ts=2 sw=2 sts=2 et:
 <a href="{$catalogs.provider}/extra_fields.php">{$lng.lbl_extra_fields}</a>
 {/if}
 {if $active_modules.Manufacturers}
-<a href="{$catalogs.provider}/manufacturers.php">{$lng.lbl_manufacturers}</a>
+
 {/if}
 {if $active_modules.Special_Offers ne ""}
 {include file="modules/Special_Offers/menu_provider.tpl"}

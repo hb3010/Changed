@@ -12,11 +12,35 @@ vim: set ts=2 sw=2 sts=2 et:
 
 {else}
 
-  <ul>
+
+			<div class="quick-order-categories-box">
+				<div class="quick-order-categories">
+				<input type="hidden" name="base_url" id="base_url" value="{$baseUrl}" />
     {foreach from=$categories_menu_list item=c name=categories}
-      <li{interline name=categories}><a href="home.php?cat={$c.categoryid}" title="{$c.category|escape}">{$c.category|amp}</a></li>
-    {/foreach}
-  </ul>
+      
+    
+ 
+ 					<div class="quick-order-category-item">
+ 						{if $sub_cat_show[$c.categoryid] ne '' }  						
+  						<div class="quick-order-category quick-order-category-click" id="{$c.categoryid}" onclick="return Hide_Show('{$c.categoryid}_cat');">{$c.category|amp}</div>
+  						<div class="quick-order-subcategories" id="{$c.categoryid}_cat">
+  							{foreach from=$sub_cat_show[$c.categoryid] item=sc key=sub_cat}
+							<div class="quick-order-subcategory-item has-products">
+ 								<div class="quick-order-subcategory quick-order-category-click" id="{$sc.id}" onclick="return loadProducts('{$sc.id}', 'home');">{$sc.name}</div>
+							</div>							
+							{/foreach}
+  						</div>
+  						{else}
+  						<div class="quick-order-category quick-order-category-click" id="{$c.categoryid}" onclick="return loadProducts('{$c.categoryid}', 'home');">{$c.category|amp}</div>
+  						{/if}
+ 					</div>
+
+ 					<div class="quick-order-category-sep"></div>
+ 					{/foreach}
+ 				</div>
+ 			</div>	
+
+  
 
   {assign var="additional_class" value="menu-categories-list"}
 

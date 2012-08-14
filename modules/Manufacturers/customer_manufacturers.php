@@ -47,6 +47,42 @@ $manufacturers_count = func_query_first_cell("SELECT COUNT(manufacturerid) FROM 
 
 if ($manufacturers_count > 0) {
 
+    
+    
+    //BON ADD FOR AJAX LOAD MANUFACTURE BY COUNTRY
+    /* Load manufactures for country by ajax */
+    if (isset($_POST["manufacture_load"])&&($_POST["manufacture_load"]=="yes")){
+    	
+    	sleep(1);
+    	
+    	$countryid = $_POST["countryId"];
+    	$manufactures_ajax_list = array();
+	    
+    	$manufactures_ajax_list_query = db_query("SELECT m.manufacturerid , m.manufacturer FROM $sql_tbl[manufacturers] m, $sql_tbl[manufacturers_to_categories] mct WHERE m.manufacturerid=mct.manufacturerid AND mct.countries_iso_code_2='$countryid'");
+	    
+	    $i=0;
+	    while ($result=db_fetch_array($manufactures_ajax_list_query)){
+	    	$manufactures_ajax_list[$i] = $result;
+	    	$i++;
+	    }
+	    print_r(json_encode($manufactures_ajax_list));
+	    die();
+	    
+    }
+	
+    
+    /* Load all country */
+    $country_list = array();
+    $country_list_query = db_query("SELECT mc.countries_name as name, mc.countries_iso_code_2 as code FROM $sql_tbl[manufacture_categories] mc, $sql_tbl[manufacturers_to_categories] mct WHERE mc.countries_iso_code_2=mct.countries_iso_code_2 GROUP BY mc.countries_iso_code_2");
+    
+    $i=0;
+    while ($result=db_fetch_array($country_list_query)){
+    	$country_list[$i] = $result;
+    	$i++;
+    }
+    $smarty -> assign("manufacture_country", $country_list);
+    //END BON ADD
+    
     if ($config['Manufacturers']['manufacturers_limit'] > 0) {
 
         $smarty->assign('show_other_manufacturers', ($manufacturers_count > $config['Manufacturers']['manufacturers_limit']));

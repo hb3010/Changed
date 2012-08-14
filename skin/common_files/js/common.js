@@ -1323,3 +1323,197 @@ function xConfirm(msg, callback, header) {
 
 }
 
+/****************************************************/
+/* BON ADD FOR AJAX LOAD */
+
+/* Hide or show subcategory by ajax */
+function Hide_Show(id){		
+	$("#"+id).slideToggle();	
+}
+
+/* Load products list at Home page and Products page */
+function loadProducts(catid) {
+	var hasload = $('#ajax_load_part').val();
+	if(hasload == 1){
+		$('#ajax_list').html('Loading...');
+		var strURL = $('#base_url').val();	
+		var data = {catid: catid, ajax_load: 1};
+		$.ajax({
+			url: strURL,
+			type: 'POST',
+			cache: false,
+			data: data, 
+			success: function(string){
+				var html = '<div class="quick-order-box quick-order-box-bottom"><div class="quick-order-box-title"></div><div class="quick-order-box-container"><div class="quick-order-products"><div class="quick-order-products-box"><div class="quick-order-products-content quick-order-main-window"><div style="display: block;" id="quick-order-main-display"><div class="quick-order-products-return"><div class="quick-order-products-list" id="ajax_list">';
+				var getData = $.parseJSON(string);
+				$.each(getData, function(i, item) {
+				    html += '<div class="quick-order-product" id="'+item.productid+'">';
+				    html += '<div class="quick-order-product-thumb">';
+				    html += '<div class="quick-order-product-thumb-box" style="width: 135px"><img src="http://www.myfood.com/bon/image.php?type=T&id='+item.productid+'" alt="'+item.product+'" height="125" width="125"></div></div>';
+				    html += '<div class="quick-order-product-data"><div class="quick-order-product-box1"><div class="quick-order-product-box2"><div class="quick-order-product-content1"><div class="quick-order-product-content2">';
+				    html += '<div class="quick-order-product-title">'+item.product+'</div>';
+				    html += '<div class="quick-order-product-price"><span class="quick-order-price-text"><span class="currency">$'+item.price+'</span></span>';
+				    html += '</div><div class="quick-order-product-descr">'+item.descr+'</div></div>';
+				    html += '</div><div class="quick-order-product-add"><div class="quick-order-product-add-box"><div class="quick-order-product-qty"><input name="amount_'+item.productid+'" id="amount_'+item.productid+'" value="1" type="text"></div><div class="quick-order-product-btn"><input type="button" value="Add" id="quick-add-input" onclick="return cartSubmitAjax(\''+item.productid+'\');" /></div><div class="clearing"></div></div></div></div></div></div><div class="clearing"></div></div><div class="quick-order-product-sep"></div>';
+				    
+				});	
+				
+				html += '</div></div></div></div></div></div></div></div>';
+				
+				$('#ajax_list').html(html);
+			},
+			error: function (){
+				alert('Loading Error!');
+			}
+		});
+	}	
+	else {
+		window.open('home.php?cat='+catid, '_self');
+	}
+}
+
+/* Add products to cart by ajax */
+function cartSubmitAjax(productid){
+	$('#ajax_minicart').html('Loading...');
+	var strURL = 'http://www.myfood.com/bon/cart.php';
+	var amount = $("#amount_"+productid).val();
+	var data = {ajax_load: 1, mode: "add", productid: productid, amount: amount};
+	$.ajax({
+		url: strURL,
+		type: 'POST',
+		cache: false,
+		data: data, 
+		success: function(string){
+			var html = '<div class="quick-order-cart-products-box"><div class="quick-order-cart-products-display">';
+			var getData = $.parseJSON(string);
+			var total = 0;
+			var count = 1;
+			$.each(getData, function(i, item) {
+				
+			    html += '<div class="quick-order-cart-product" id="item-4"><div class="quick-order-cart-product-box"><div class="quick-order-cart-product-x"><span>x</span></div><div class="quick-order-cart-product-main">';
+			    html += '<div class="quick-order-cart-product-title">'+ item.product +'</div>';
+			    html += '<div class="quick-order-cart-product-subtotal">'+ item.amount +' x <span class="currency">$'+ item.price +'</span> = <span class="currency">$'+ item.subtotal +'</span></div></div>';
+			    html += '</div></div><div class="quick-order-cart-sep"></div>';
+			    total += Number(item.subtotal, 2);
+			    count++;
+			});	
+			html += '<div><strong>Total: &nbsp;$'+total+'</strong></div>'
+			
+			html += '</div></div>';
+			
+			$("#ajax_minicart").html(html);
+		},
+		error: function (){
+			alert('Loading Error!');
+		}
+	});	
+}
+
+/* Remove products from cart by ajax */
+function ajaxRemoveProduct(indexed){
+	$('#ajax_minicart').html('Loading...');
+	var strURL = 'http://www.myfood.com/bon/cart.php';	
+	var data = {ajax_load: 1, mode: "delete", productindex: indexed};alert(indexed);
+	$.ajax({
+		url: strURL,
+		type: 'POST',
+		cache: false,
+		data: data, 
+		success: function(string){
+			var html = '<div class="quick-order-cart-products-box"><div class="quick-order-cart-products-display">';
+			var getData = $.parseJSON(string);
+			var total = 0;
+			var count = 1;
+			$.each(getData, function(i, item) {
+			    html += '<div class="quick-order-cart-product" id="item-4"><div class="quick-order-cart-product-box"><div class="quick-order-cart-product-x"><span>x</span></div><div class="quick-order-cart-product-main">';
+			    html += '<div class="quick-order-cart-product-title">'+ item.product +'</div>';
+			    html += '<div class="quick-order-cart-product-subtotal">'+ item.amount +' x <span class="currency">$'+ item.price +'</span> = <span class="currency">$'+ item.subtotal +'</span></div></div>';
+			    html += '</div></div><div class="quick-order-cart-sep"></div>';
+			    total += Number(item.subtotal, 2);
+			    count++;
+			});	
+			html += '<div><strong>Total: &nbsp;$'+total+'</strong></div>'
+			
+			html += '</div></div>';
+			
+			$("#ajax_minicart").html(html);
+		},
+		error: function (){
+			alert('Loading Error!');
+		}
+	});	
+}
+
+/* Load products on Manufacture page */
+function loadProductsManufacture(manufacturerid) {
+	var hasload = $('#ajax_load_part').val();
+	if(hasload == 1){
+		$('#ajax_list').html('Loading...');
+		var strURL = $('#base_url').val();	
+		var data = {manufactureid: manufacturerid, ajax_load: 1};
+		$.ajax({
+			url: strURL,
+			type: 'POST',
+			cache: false,
+			data: data, 
+			success: function(string){
+				var html = '<div class="quick-order-box quick-order-box-bottom"><div class="quick-order-box-title"></div><div class="quick-order-box-container"><div class="quick-order-products"><div class="quick-order-products-box"><div class="quick-order-products-content quick-order-main-window"><div style="display: block;" id="quick-order-main-display"><div class="quick-order-products-return"><div class="quick-order-products-list" id="ajax_list">';
+				var getData = $.parseJSON(string);
+				$.each(getData, function(i, item) {
+				    html += '<div class="quick-order-product" id="'+item.productid+'">';
+				    html += '<div class="quick-order-product-thumb">';
+				    html += '<div class="quick-order-product-thumb-box" style="width: 135px"><img src="http://www.myfood.com/bon/image.php?type=T&id='+item.productid+'" alt="'+item.product+'" height="125" width="125"></div></div>';
+				    html += '<div class="quick-order-product-data"><div class="quick-order-product-box1"><div class="quick-order-product-box2"><div class="quick-order-product-content1"><div class="quick-order-product-content2">';
+				    html += '<div class="quick-order-product-title">'+item.product+'</div>';
+				    html += '<div class="quick-order-product-price"><span class="quick-order-price-text"><span class="currency">$'+item.price+'</span></span>';
+				    html += '</div><div class="quick-order-product-descr">'+item.descr+'</div></div>';
+				    html += '</div><div class="quick-order-product-add"><div class="quick-order-product-add-box"><div class="quick-order-product-qty"><input name="amount_'+item.productid+'" id="amount_'+item.productid+'" value="1" type="text"></div><div class="quick-order-product-btn"><input type="button" value="Add" id="quick-add-input" onclick="return cartSubmitAjax(\''+item.productid+'\');" /></div><div class="clearing"></div></div></div></div></div></div><div class="clearing"></div></div><div class="quick-order-product-sep"></div>';
+				    
+				});	
+				
+				html += '</div></div></div></div></div></div></div></div>';
+				
+				$('#ajax_list').html(html);
+			},
+			error: function (){
+				alert('Loading Error!');
+			}
+		});
+	}	
+	else {
+		window.open('manufacturers.php?manufacturerid='+manufacturerid, '_self');
+	}
+}
+
+/* Load manufactures list in left side by country */
+function loadManufacture(){
+	$("#manufactures_list").html("Loading...");
+	var strURL = 'http://www.myfood.com/bon/manufacturers.php';
+	var countryId = $("#manufacture_country_code").val();
+	var data = {manufacture_load: "yes", countryId: countryId};
+	$.ajax({
+		url: strURL,
+		type: 'POST',
+		cache: false,
+		data: data, 
+		success: function(string){
+			var html = '<ul>';
+			var getData = $.parseJSON(string);
+			
+			$.each(getData, function(i, item) {
+			    
+			    html += '<li><span onclick="return loadProductsManufacture(\''+ item.manufacturerid +'\');">'+ item.manufacturer +'</span></li>';
+			    
+			});			
+			
+			html += '</ul>';
+			
+			$("#manufactures_list").html(html);
+		},
+		error: function (){
+			alert('Loading Error!');
+		}
+	});	
+}
+/* END BON ADD */
+/*********************************************/

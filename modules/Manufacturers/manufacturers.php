@@ -274,9 +274,20 @@ if (
                 $query_data_lng,
                 true
             );
+            
+            //BON ADD FOR MANUFACTURE CATEGORIES
+            $manufacture_existed = func_query("SELECT * FROM $sql_tbl[manufacturers_to_categories] WHERE manufacturerid='$manufacturerid'");
+            if (empty($manufacture_existed)){
+            	db_query("INSERT INTO $sql_tbl[manufacturers_to_categories] SET countries_iso_code_2='$manufacture_country_id', manufacturerid='$manufacturerid'");
+            }
+            else {
+            	db_query("UPDATE $sql_tbl[manufacturers_to_categories] SET countries_iso_code_2='$manufacture_country_id' WHERE manufacturerid='$manufacturerid'");
+            }
+			
+			//END BON ADD MANUFACTURE CATEGORIES
 
             $top_message['content'] = func_get_langvar_by_name('msg_adm_err_manufacturer_upd');
-
+			
         } else {
 
             // Add new manufacturer
@@ -364,9 +375,12 @@ if (
                 );
 
                 $top_message['content'] = func_get_langvar_by_name('msg_adm_err_manufacturer_add');
-
-            }
-
+				
+            }            
+            
+            //BON ADD FOR MANUFACTURE CATEGORIES
+			db_query("INSERT INTO $sql_tbl[manufacturers_to_categories] SET countries_iso_code_2='$manufacture_country_id', manufacturerid='$manufacturerid'");
+			//END BON ADD MANUFACTURE CATEGORIES
         }
 
         if (!empty($manufacturerid) && $administrate) {
@@ -556,6 +570,14 @@ if (
             $smarty->assign('manufacturer', $manufacturer_data);
             $smarty->assign('image', func_image_properties('M', $manufacturerid));
         }
+        
+        //BON ADD FOR MANUFACTURE CATEGORIES
+        $manufacture_existed_query = db_query("SELECT countries_iso_code_2 FROM $sql_tbl[manufacturers_to_categories] WHERE manufacturerid='$manufacturerid'");
+        $manufacture_existed = db_fetch_array($manufacture_existed_query);
+        if (!empty($manufacture_existed)){
+        	$smarty->assign("is_categories", $manufacture_existed["countries_iso_code_2"]);
+        }
+        //END BON ADD
 
     } else {
 
@@ -588,6 +610,14 @@ if (
             foreach ($manufacturers as $k => $v) {
                 $manufacturers[$k]['products_count'] = func_query_first_cell ("SELECT COUNT(*) FROM $sql_tbl[products] WHERE manufacturerid = '$v[manufacturerid]'");
                 $manufacturers[$k]['used_by_others'] = func_manufacturer_is_used($v['manufacturerid'], $v['provider']);
+                
+                //BON ADD FOR CATEGORIES MANUFACTURE 
+                
+                $getCountry_query = db_query("SELECT mc.countries_name FROM  $sql_tbl[manufacture_categories] mc, $sql_tbl[manufacturers_to_categories] mtc WHERE mc.countries_iso_code_2=mtc.countries_iso_code_2 and mtc.manufacturerid='" . $v["manufacturerid"] . "'");
+                $result=db_fetch_array($getCountry_query);
+                $manufacturers[$k]['country']=$result["countries_name"];
+                
+                //END BON ADD CATEGORIES MANUFACTURE
             }
 
             $smarty->assign('navigation_script', 'manufacturers.php?');
@@ -602,6 +632,21 @@ if (
     $smarty->assign('total_items', $total_items);
 
 }
+
+//BON ADD FOR ADD COUNTRY TO MANUFACTURES
+$country_manufacture = array();
+$country_code_query = db_query("SELECT countries_iso_code_2, countries_name FROM $sql_tbl[manufacture_categories] WHERE 1");
+$i=0;
+while ($result = db_fetch_array($country_code_query)){
+	
+	$country_manufacture[$i]["code"] = $result["countries_iso_code_2"];	
+	$country_manufacture[$i]["name"] = $result["countries_name"];	
+	$i++;
+}
+
+$smarty -> assign("manufacture_country", $country_manufacture);
+
+//END BON ADD
 
 if (!empty($page)) {
     $smarty->assign('page', $page);
